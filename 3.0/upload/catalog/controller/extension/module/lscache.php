@@ -1247,7 +1247,28 @@ class ControllerExtensionModuleLSCache extends Controller
         return $num_pages;
     }
 
-    
+
+	
+	protected function CheckDBBuildKeys($buildpath,$keysexist=false) {
+
+        if ( !$this->model_extension_module_lscache->getSettingValue('module_lscache','module_lscache_'. $buildpath . '_recache_status') ) {
+            $this->db->query("INSERT INTO " . DB_PREFIX . "setting SET store_id = '0', `code` = 'module_lscache', `key` = '" . 'module_lscache_' . $buildpath . '_recache_status' . "', `value` = 'empty' ");
+            $this->db->query("INSERT INTO " . DB_PREFIX . "setting SET store_id = '0', `code` = 'module_lscache', `key` = '" . 'module_lscache_' . $buildpath . '_recache_total' . "', `value` = '0' ");
+            $this->db->query("INSERT INTO " . DB_PREFIX . "setting SET store_id = '0', `code` = 'module_lscache', `key` = '" . 'module_lscache_' . $buildpath . '_last_recached' . "', `value` = '0' ");
+        }
+
+        if ( ($this->model_extension_module_lscache->getSettingValue('module_lscache','module_lscache_'. $buildpath . '_recache_status') == 'empty') || $keysexist ) {
+            $this->db->query("DROP TABLE IF EXISTS " . DB_PREFIX . "lscache_" . $buildpath . "_urls_list ");
+            $this->db->query("DELETE FROM " . DB_PREFIX . "setting WHERE store_id = '0' AND `code` = 'module_lscache' AND `key` = '" . 'module_lscache_' . $buildpath . '_recache_total' . "' ");
+		    $this->db->query("INSERT INTO " . DB_PREFIX . "setting SET store_id = '0', `code` = 'module_lscache', `key` = '" . 'module_lscache_' . $buildpath . '_recache_total' . "', `value` = '0' ");
+            $this->db->query("DELETE FROM " . DB_PREFIX . "setting WHERE store_id = '0' AND `code` = 'module_lscache' AND `key` = '" . 'module_lscache_' . $buildpath . '_last_recached' . "' ");
+		    $this->db->query("INSERT INTO " . DB_PREFIX . "setting SET store_id = '0', `code` = 'module_lscache', `key` = '" . 'module_lscache_' . $buildpath . '_last_recached' . "', `value` = '0' ");
+		    return true;
+        } else {
+            return false;
+        }
+	}
+	
 
 	protected function BuildCrawlListFromDB($buildpath,$cli) {
 	    
