@@ -1246,6 +1246,188 @@ class ControllerExtensionModuleLSCache extends Controller
 
         return $num_pages;
     }
+
+    
+    
+    
+	protected function CookiesForCrawler($userAgent,$cookie,$is_lscache) {
+
+     if ( $is_lscache == TRUE ) {
+        $cookie = str_replace('_lscache_vary=','',$cookie);
+        if ( stripos($cookie, 'session') == FALSE ) {$cookie_sess = '';}
+        if ( stripos($cookie, 'language') == FALSE ) {$cookie_lang = '';}
+        if ( stripos($cookie, 'currency') == FALSE ) {$cookie_curr = '';}
+        $cookies_lscache =  explode( ',', $cookie );
+        foreach ( $cookies_lscache as $cookie_lscache ) {
+                    if ( stripos($cookie_lscache, 'session') !== FALSE ) {$cookie_sess = $cookie_lscache;}
+        if ( stripos($cookie_lscache, 'language') !== FALSE ) {$cookie_lang = $cookie_lscache;}
+        if ( stripos($cookie_lscache, 'currency') !== FALSE ) {$cookie_curr = $cookie_lscache;}
+        }
+        $cookie = '';
+     } else {
+         	$cookie_sess = '';
+			$cookie_lang = '';
+			$cookie_curr = '';
+     }
+
+        $cookie_ua = '';
+		$cookie_uap = '';
+		$cookie_uab = '';
+		$cookie_uas = '';
+		if ( (stripos($userAgent, 'bot') !== FALSE) || (stripos($userAgent, 'compatible') !== FALSE) || (stripos($userAgent, 'headless') !== FALSE) || (stripos($userAgent, 'runner') !== FALSE) || (stripos($userAgent, 'walker') !== FALSE) ) {
+            $cookie_ua = '';
+			$cookie_uap = '';
+			$cookie_uab = '';
+			$cookie_uas = '';
+			//$cookie_sess = '';
+			//$cookie_lang = '';
+			//$cookie_curr = '';
+		} else {
+            if ( (stripos($userAgent, 'OPR') !== FALSE) || (stripos($userAgent, 'OPT') !== FALSE) || (stripos($userAgent, 'Opera') !== FALSE) ) {
+                //$cookie_uab = 'browser%3Aopera';
+                $cookie_uab = 'browser%3Achrome';
+            } elseif ( (stripos($userAgent, 'FxiOS') !== FALSE) || (stripos($userAgent, 'Firefox') !== FALSE) ) {
+                //$cookie_uab = 'browser%3Afirefox';
+                $cookie_uab = 'browser%3Achrome';
+            } elseif ( (stripos($userAgent, 'Edg') !== FALSE) ) {
+                //$cookie_uab = 'browser%3Aedge';
+                $cookie_uab = 'browser%3Achrome';
+            } elseif ( (stripos($userAgent, 'YaBrowser') !== FALSE) ) {
+                //$cookie_uab = 'browser%3Ayandex';
+                $cookie_uab = 'browser%3Achrome';
+            } elseif ( (stripos($userAgent, 'Lighthouse') !== FALSE) ) {
+                //elseif ( (stripos($userAgent, 'Lighthouse') !== FALSE) || (stripos($userAgent, 'Headless') !== FALSE) ) {
+                //$cookie_uab = 'browser%3Alighthouse';
+                $cookie_uab = 'browser%3Achrome';
+            } elseif ( (stripos($userAgent, 'CriOS') !== FALSE) || (stripos($userAgent, 'Chrome') !== FALSE) ) {
+                $cookie_uab = 'browser%3Achrome';
+            } elseif ( (stripos($userAgent, 'Safari') !== FALSE) ) {
+                    if ( (stripos($userAgent, 'Version/14') !== FALSE) || (stripos($userAgent, 'Version/15') !== FALSE) || (stripos($userAgent, 'Version/16') !== FALSE) || (stripos($userAgent, 'Version/17') !== FALSE) ) {
+                    $cookie_uab = 'browser%3Achrome';
+                    } else {
+                    $cookie_uab = 'browser%3Asafari';
+                    }
+            } elseif ( (stripos($userAgent, 'Instagram') !== FALSE) ) {
+                //$cookie_uab = 'browser%3Asafari';
+                //$cookie_uab = 'browser%3Asafari';
+                $cookie_uab = 'browser%3Achrome';
+            } else {
+                $cookie_uab = ''; //'browser%3Aunknown';
+            }
+
+            if (stripos($userAgent, 'Macintosh') !== FALSE) {
+                $cookie_uap = 'apple%3Amacintosh';
+            } elseif (stripos($userAgent, 'iPhone') !== FALSE) {
+                $cookie_uap = 'apple%3Aiphone';
+            } elseif (stripos($userAgent, 'iPad') !== FALSE) {
+                $cookie_uap = 'apple%3Aipad';
+            } else {
+                $cookie_uap = '';
+            }
+
+            if (stripos($userAgent, 'Windows') !== FALSE) {
+                $cookie_uas = 'os%3Awindows';
+            } elseif (stripos($userAgent, 'Linux') !== FALSE) {
+                $cookie_uas = 'os%3Alinux';
+            } else {
+                $cookie_uas = '';
+            }
+
+		    if (stripos($userAgent, 'iPhone') !== FALSE){
+                $cookie_ua = 'device%3Amobile';
+            } elseif (stripos($userAgent, 'iPad') !== FALSE){
+			    $cookie_ua = 'device%3Atablet';
+            } elseif ( (stripos($userAgent, 'Android') !== FALSE) && (stripos($userAgent, 'Chrome') !== FALSE) && (stripos($userAgent, 'Mobile') !== FALSE) ){
+                $cookie_ua = 'device%3Amobile';
+            } elseif ( (stripos($userAgent, 'Android') !== FALSE) && (stripos($userAgent, 'Chrome') !== FALSE) && (stripos($userAgent, 'Mobile') == FALSE) ){
+                $cookie_ua = 'device%3Atablet';
+            } else {
+                $cookie_ua = '';
+            }
+
+		}
+
+        //apple cookie
+		if ( !( $cookie_uap == '') ) {
+			if (stripos($cookie, '_lscache_vary') !== FALSE){
+				//$cookie .= ',';
+				$cookie .= '%2C';
+				$cookie .= $cookie_uap;
+			} else {
+				$cookie = '_lscache_vary=' . $cookie_uap;
+			}
+		}
+
+        //browser cookie
+		if ( !( $cookie_uab == '') ) {
+			if (stripos($cookie, '_lscache_vary') !== FALSE){
+				//$cookie .= ',';
+				$cookie .= '%2C';
+				$cookie .= $cookie_uab;
+			} else {
+				$cookie = '_lscache_vary=' . $cookie_uab;
+			}
+		}
+
+        //currency cookie
+		if ( !( $cookie_curr == '') ) {
+		    if (stripos($cookie, '_lscache_vary') !== FALSE){
+				//$cookie .= ',';
+				$cookie .= '%2C';
+				$cookie .= $cookie_curr;
+			} else {
+				$cookie = '_lscache_vary=' . $cookie_curr;
+			}
+		}
+
+        //device cookie
+		if ( !( $cookie_ua == '') ) {
+		    if (stripos($cookie, '_lscache_vary') !== FALSE){
+				//$cookie .= ',';
+				$cookie .= '%2C';
+				$cookie .= $cookie_ua;
+			} else {
+				$cookie = '_lscache_vary=' . $cookie_ua;
+			}
+		}
+
+        //language cookie
+		if ( !( $cookie_lang == '') ) {
+		    if (stripos($cookie, '_lscache_vary') !== FALSE){
+				//$cookie .= ',';
+				$cookie .= '%2C';
+				$cookie .= $cookie_lang;
+			} else {
+				$cookie = '_lscache_vary=' . $cookie_lang;
+			}
+		}
+
+        //os cookie
+		if ( !( $cookie_uas == '') ) {
+			if (stripos($cookie, '_lscache_vary') !== FALSE){
+				//$cookie .= ',';
+				$cookie .= '%2C';
+				$cookie .= $cookie_uas;
+			} else {
+				$cookie = '_lscache_vary=' . $cookie_uas;
+			}
+		}
+
+        //session cookie
+		if ( !( $cookie_sess == '') ) {
+		    if (stripos($cookie, '_lscache_vary') !== FALSE){
+				//$cookie .= ',';
+				$cookie .= '%2C';
+				$cookie .= $cookie_sess;
+			} else {
+				$cookie = '_lscache_vary=' . $cookie_sess;
+			}
+		}
+
+		return $cookie;
+
+    }
+
     
 
 }
