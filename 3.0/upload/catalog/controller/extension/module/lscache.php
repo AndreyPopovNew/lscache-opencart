@@ -1248,7 +1248,51 @@ class ControllerExtensionModuleLSCache extends Controller
     }
 
     
-    
+
+	protected function BuildCrawlListFromDB($buildpath,$cli) {
+	    
+	     if ( $GLOBALS['recache_start_number'] == 0 ) {
+	     $LastRecachedItem = $this->model_extension_module_lscache->getSettingValue('module_lscache','module_lscache_' . $buildpath . '_last_recached');
+	    } else {
+	        $LastRecachedItem = $GLOBALS['recache_start_number'];
+	    }
+        $LastRecachedItemStep = 0;
+        $TotalUrlsInList = $this->model_extension_module_lscache->getSettingValue('module_lscache','module_lscache_' . $buildpath . '_recache_total');
+        // crawl Urls from built Product List
+        for ($i = $LastRecachedItem + 1; $i <= $TotalUrlsInList; $i = $i + 1019 + $LastRecachedItemStep ) {
+            $LastRecacheItemNew = $i+1019;
+            if ( $GLOBALS['recache_end_number'] == 0 ) {
+                if ( $LastRecacheItemNew > $TotalUrlsInList ) $LastRecacheItemNew = $TotalUrlsInList;
+            } else {
+                if ( $LastRecacheItemNew > $GLOBALS['recache_end_number'] ) $LastRecacheItemNew = $GLOBALS['recache_end_number'];
+                if ( $LastRecacheItemNew > $TotalUrlsInList ) $LastRecacheItemNew = $TotalUrlsInList;
+                if ( $i >= $GLOBALS['recache_end_number'] ) break;
+            }
+            $UrlsCountCount = intval($i/1020)+1;
+            echo 'recaching '. $UrlsCountCount . ' part of ' . $buildpath . ' urls list...' . ($cli ? '' : '<br>') . PHP_EOL;
+            //$UrlsTest = $this->BuildUrlsListForRecache($i,$LastRecacheItemNew);
+                switch ( $buildpath ) {
+		            case "product_list": $UrlsTest = $this->BuildUrlsListForRecache($i,$LastRecacheItemNew);break;
+		            case "category":     $UrlsTest = $this->BuildCategoryUrlsListForRecache($i,$LastRecacheItemNew);break;
+            		case "manufacturer": $UrlsTest = $this->BuildManufacturerUrlsListForRecache($i,$LastRecacheItemNew);break;
+            		case "catalog":      $UrlsTest = $this->BuildCatalogUrlsListForRecache($i,$LastRecacheItemNew);break;
+                }
+            //if ( $BuildListForPurge ) {
+            $this->crawlUrls($UrlsTest, $cli, true , $UrlsCountCount, $TotalUrlsInList);
+            //} else {
+            //    $this->crawlUrls($UrlsTest, $cli, true , $UrlsCountCount, $TotalUrlsInList, false);
+            //}
+            $LastRecachedItemStep = 1;
+            $UrlsTest = array();
+            if ( $GLOBALS['recache_start_number'] == 0 ) {
+            $this->db->query("DELETE FROM " . DB_PREFIX . "setting WHERE store_id = '0' AND `code` = 'module_lscache' AND `key` = '" . 'module_lscache_' . $buildpath . '_last_recached' . "' ");
+		    $this->db->query("INSERT INTO " . DB_PREFIX . "setting SET store_id = '0', `code` = 'module_lscache', `key` = '" . 'module_lscache_' . $buildpath . '_last_recached' . "', `value` = '" . $LastRecacheItemNew . "' ");
+            }
+		    echo 'recached ' . $buildpath . ' urls list from ' . $i . ' to ' . $LastRecacheItemNew . ' completed' . ($cli ? '' : '<br>') . PHP_EOL;
+        }
+
+	}
+	
     
 	protected function CookiesForCrawler($userAgent,$cookie,$is_lscache) {
 
