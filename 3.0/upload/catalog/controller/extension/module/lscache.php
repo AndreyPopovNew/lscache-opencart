@@ -1249,6 +1249,20 @@ class ControllerExtensionModuleLSCache extends Controller
 
 
 	
+	protected function checkOS() {
+
+        if ( isset($_SERVER['HTTP_USER_AGENT']) ) {
+        if (stripos($_SERVER['HTTP_USER_AGENT'], 'Windows') !== FALSE) {
+            return 'windows';
+        }
+        if (stripos($_SERVER['HTTP_USER_AGENT'], 'Linux') !== FALSE) {
+            return 'linux';
+        }
+        }
+        return FALSE;
+    }
+	
+	
 	protected function checkisBot() {
 
 		if ( isset($_SERVER['HTTP_USER_AGENT']) ) {
