@@ -1249,6 +1249,31 @@ class ControllerExtensionModuleLSCache extends Controller
 
 
 	
+	protected function BuildUrlsListForRecache($FirstItem,$LastItem) {
+	    
+	    $UrlsList = array();
+	    $PreviousURL = '';
+	    for ($num_item = $FirstItem ; $num_item <= $LastItem ;  $num_item++ ) {
+	        $PathToRecache = (array)$this->db->query("SELECT `lscache_product_url` FROM `" . DB_PREFIX . "lscache_product_list_urls_list` WHERE url_list_id = '" . $num_item ."' " );
+	        if (stripos($PathToRecache['row']['lscache_product_url'], 'popup') !== FALSE) {
+	            $CurrentURL = $this->url->link('journal3/product', $PathToRecache['row']['lscache_product_url'] );
+	            $UrlsList[] = $CurrentURL;
+	            // $UrlsList[] = $this->url->link('journal3/product', $PathToRecache['row']['lscache_product_url'] );
+	        } else {
+	            // reduce urls numbers when SEO enabled
+	            $CurrentURL = $this->url->link('product/product', $PathToRecache['row']['lscache_product_url'] );
+	            if ( $CurrentURL !== $PreviousURL ) {
+	                $UrlsList[] = $CurrentURL;
+	            }
+	        // $UrlsList[] = $this->url->link('product/product', $PathToRecache['row']['lscache_product_url'] );
+	        }
+	        $PreviousURL = $CurrentURL;
+	    }
+
+	    return $UrlsList;
+	}
+	
+	
 	protected function BuildCatalogUrls($bots_recache_mode=false) {
 	    
         $UrlsCount1 = 0;
