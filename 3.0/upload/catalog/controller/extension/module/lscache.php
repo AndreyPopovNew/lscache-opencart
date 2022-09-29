@@ -1249,6 +1249,17 @@ class ControllerExtensionModuleLSCache extends Controller
 
 
 	
+	protected function BuildCategoryUrlsListForRecache($FirstItem,$LastItem) {
+	    
+	    $UrlsList = array();
+	    for ($num_item = $FirstItem ; $num_item <= $LastItem ;  $num_item++ ) {
+	        $PathToRecache = (array)$this->db->query("SELECT `lscache_category_url` FROM `" . DB_PREFIX . "lscache_category_urls_list` WHERE url_list_id = '" . $num_item ."' " );
+	        $UrlsList[] = $this->url->link('product/category', $PathToRecache['row']['lscache_category_url'] );
+	    }
+	    return $UrlsList;
+	}
+	
+	
 	protected function CheckDBBuildKeys($buildpath,$keysexist=false) {
 
         if ( !$this->model_extension_module_lscache->getSettingValue('module_lscache','module_lscache_'. $buildpath . '_recache_status') ) {
