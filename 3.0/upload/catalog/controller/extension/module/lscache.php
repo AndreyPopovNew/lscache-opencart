@@ -1249,6 +1249,47 @@ class ControllerExtensionModuleLSCache extends Controller
 
 
 	
+	protected function BuildCatalogUrls($bots_recache_mode=false) {
+	    
+        $UrlsCount1 = 0;
+        $this->db->query("CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "lscache_catalog_urls_list` ( `url_list_id` int(11) NOT NULL AUTO_INCREMENT, `lscache_catalog_url` varchar(255) NOT NULL, `recache_status` tinyint(1) NOT NULL, PRIMARY KEY (`url_list_id`)) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;");
+        
+            $filter_data = array('filter_category_id'  => 0);
+            $num_pages = $this->CountNumberOfPages($filter_data);
+                  $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_catalog_urls_list SET lscache_catalog_url = '' ");
+                  $UrlsCount1++;
+			                  if( !empty($this->lscache->includeSorts[0]) ) {
+                                    foreach($this->lscache->includeSorts as $uri) {
+                                        $uri = str_replace('&amp;', '&', $uri);
+                                        $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_catalog_urls_list SET lscache_catalog_url = '" . $uri . "' ");
+                                        $UrlsCount1++;
+                                    }
+                                }
+            if ( !$bots_recache_mode ) {
+            for ($num_page = 2 ; $num_page <= $num_pages ;  $num_page++ ) {
+			          $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_catalog_urls_list SET lscache_catalog_url = '" . 'page=' . $num_page . "' ");
+			          $UrlsCount1++;
+			                  if( !empty($this->lscache->includeSorts[0]) ) {
+                                    foreach($this->lscache->includeSorts as $uri) {
+                                        $uri = str_replace('&amp;', '&', $uri);
+                                        $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_catalog_urls_list SET lscache_catalog_url = '" . $uri . '&page=' . $num_page . "' ");
+                                        $UrlsCount1++;
+                                    }
+                                }
+            }
+            }
+        
+		$this->db->query("DELETE FROM " . DB_PREFIX . "setting WHERE store_id = '0' AND `code` = 'module_lscache' AND `key` = 'module_lscache_catalog_recache_status' ");
+		$this->db->query("INSERT INTO " . DB_PREFIX . "setting SET store_id = '0', `code` = 'module_lscache', `key` = 'module_lscache_catalog_recache_status', `value` = 'full'");
+		
+		$this->db->query("DELETE FROM " . DB_PREFIX . "setting WHERE store_id = '0' AND `code` = 'module_lscache' AND `key` = 'module_lscache_catalog_recache_total' ");
+		$this->db->query("INSERT INTO " . DB_PREFIX . "setting SET store_id = '0', `code` = 'module_lscache', `key` = 'module_lscache_catalog_recache_total', `value` = '" . $UrlsCount1 . "' ");
+
+		return $UrlsCount1;
+
+    }
+	
+	
 	protected function BuildCatalogUrlsListForRecache($FirstItem,$LastItem) {
 	    
 	    $UrlsList = array();
