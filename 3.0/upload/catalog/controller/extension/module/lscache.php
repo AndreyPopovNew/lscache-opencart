@@ -1249,6 +1249,56 @@ class ControllerExtensionModuleLSCache extends Controller
 
 
 	
+    protected function checkBrowser() {
+
+        if ( isset($_SERVER['HTTP_USER_AGENT']) ) {
+        if ( (stripos($_SERVER['HTTP_USER_AGENT'], 'OPR') !== FALSE) || (stripos($_SERVER['HTTP_USER_AGENT'], 'OPT') !== FALSE) || (stripos($_SERVER['HTTP_USER_AGENT'], 'Opera') !== FALSE) ) {
+            //return 'opera';
+            return 'chrome';
+        }
+
+		if ( (stripos($_SERVER['HTTP_USER_AGENT'], 'FxiOS') !== FALSE) || (stripos($_SERVER['HTTP_USER_AGENT'], 'Firefox') !== FALSE) ) {
+            //return 'firefox';
+            return 'chrome';
+        }
+
+		if ( (stripos($_SERVER['HTTP_USER_AGENT'], 'Edg') !== FALSE) ) {
+            //return 'edge';
+            return 'chrome';
+        }
+
+		if ( (stripos($_SERVER['HTTP_USER_AGENT'], 'YaBrowser') !== FALSE) ) {
+            //return 'yandex';
+            return 'chrome';
+        }
+
+		//if ( (stripos($_SERVER['HTTP_USER_AGENT'], 'Lighthouse') !== FALSE) || (stripos($_SERVER['HTTP_USER_AGENT'], 'Headless') !== FALSE) ) {
+		//if ( (stripos($_SERVER['HTTP_USER_AGENT'], 'Lighthouse') !== FALSE) ) {
+        //    return 'lighthouse';
+        //}
+
+		if ( (stripos($_SERVER['HTTP_USER_AGENT'], 'CriOS') !== FALSE) || (stripos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== FALSE) ) {
+            return 'chrome';
+        }
+
+		if ( (stripos($_SERVER['HTTP_USER_AGENT'], 'Safari') !== FALSE) ) {
+		            if ( (stripos($_SERVER['HTTP_USER_AGENT'], 'Version/14') !== FALSE) || (stripos($_SERVER['HTTP_USER_AGENT'], 'Version/15') !== FALSE) || (stripos($_SERVER['HTTP_USER_AGENT'], 'Version/16') !== FALSE) || (stripos($_SERVER['HTTP_USER_AGENT'], 'Version/17') !== FALSE) ) {
+                    return 'chrome';
+		            }
+            return 'safari';
+        }
+
+        if ( (stripos($_SERVER['HTTP_USER_AGENT'], 'Instagram') !== FALSE) ) {
+            //return 'instagram';
+            //return 'safari';
+            return 'chrome';
+        }
+        return 'unknown';
+        }
+        return FALSE;
+     }
+	
+	
 	protected function checkApple() {
 
         if ( isset($_SERVER['HTTP_USER_AGENT']) ) {
