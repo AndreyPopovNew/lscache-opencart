@@ -1249,6 +1249,23 @@ class ControllerExtensionModuleLSCache extends Controller
 
 
 	
+	protected function checkApple() {
+
+        if ( isset($_SERVER['HTTP_USER_AGENT']) ) {
+        if (stripos($_SERVER['HTTP_USER_AGENT'], 'Macintosh') !== FALSE) {
+            return 'macintosh';
+        }
+        if (stripos($_SERVER['HTTP_USER_AGENT'], 'iPhone') !== FALSE) {
+            return 'iphone';
+        }
+        if (stripos($_SERVER['HTTP_USER_AGENT'], 'iPad') !== FALSE) {
+            return 'ipad';
+        }
+        }
+        return FALSE;
+    }
+	
+	
 	protected function checkOS() {
 
         if ( isset($_SERVER['HTTP_USER_AGENT']) ) {
