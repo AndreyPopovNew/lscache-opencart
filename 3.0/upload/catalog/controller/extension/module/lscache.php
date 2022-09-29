@@ -1249,6 +1249,166 @@ class ControllerExtensionModuleLSCache extends Controller
 
 
 	
+	protected function BuildCategoryUrls($bots_recache_mode=false) {
+	    
+        $UrlsCount1 = 0;
+        $this->db->query("CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "lscache_category_urls_list` ( `url_list_id` int(11) NOT NULL AUTO_INCREMENT, `lscache_category_url` varchar(255) NOT NULL, `recache_status` tinyint(1) NOT NULL, PRIMARY KEY (`url_list_id`)) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;");
+        
+        $categories_1 = $this->model_catalog_category->getCategories(0);
+        
+		foreach ($categories_1 as $category_1) {
+            $categoryPath[$category_1['category_id']] = $category_1['category_id'];
+
+			$categories_2 = $this->model_catalog_category->getCategories($category_1['category_id']);
+
+			foreach ($categories_2 as $category_2) {
+                $categoryPath[$category_2['category_id']] = $category_1['category_id'] . '_' . $category_2['category_id'];
+
+				$categories_3 = $this->model_catalog_category->getCategories($category_2['category_id']);
+
+				foreach ($categories_3 as $category_3) {
+                    $categoryPath[$category_3['category_id']] = $category_1['category_id'] . '_' . $category_2['category_id'] . '_' .  $category_3['category_id'];
+
+                        $categories_4 = $this->model_catalog_category->getCategories($category_3['category_id']);
+
+				        foreach ($categories_4 as $category_4) {
+                            $categoryPath[$category_4['category_id']] = $category_1['category_id'] . '_' . $category_2['category_id'] . '_' .  $category_3['category_id'] . '_' .  $category_4['category_id'];
+
+                            $categories_5 = $this->model_catalog_category->getCategories($category_4['category_id']);
+
+                            foreach ($categories_5 as $category_5) {
+                                $categoryPath[$category_5['category_id']] = $category_1['category_id'] . '_' . $category_2['category_id'] . '_' .  $category_3['category_id'] . '_' .  $category_4['category_id'] . '_' .  $category_5['category_id'];
+
+                                $filter_data = array('filter_category_id'  => $category_5['category_id']);
+                                $num_pages = $this->CountNumberOfPages($filter_data);
+                                $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . '_' . $category_5['category_id'] . "' ");
+                                $UrlsCount1++;
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $uri = str_replace('&amp;', '&', $uri);
+                                                    $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . '_' . $category_5['category_id'] . '&' . $uri . "' ");
+                                                    $UrlsCount1++;
+                                                }
+                                            }
+                                    if ( !$bots_recache_mode ) {
+                                    for ($num_page = 2 ; $num_page <= $num_pages ;  $num_page++ ) {
+                                        $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . '_' . $category_5['category_id'] . '&page=' . $num_page . "' ");
+                                        $UrlsCount1++;
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $uri = str_replace('&amp;', '&', $uri);
+                                                    $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . '_' . $category_5['category_id'] . '&' . $uri . '&page=' . $num_page . "' ");
+                                                    $UrlsCount1++;
+                                                }
+                                            }
+                                    }
+                                    }
+                            }
+
+                        $filter_data = array('filter_category_id'  => $category_4['category_id']);
+                        $num_pages = $this->CountNumberOfPages($filter_data);
+
+                        $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . "' ");
+                        $UrlsCount1++;
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $uri = str_replace('&amp;', '&', $uri);
+                                                    $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . '&' . $uri . "' ");
+                                                    $UrlsCount1++;
+                                                }
+                                            }
+                                if ( !$bots_recache_mode ) {
+                                for ($num_page = 2 ; $num_page <= $num_pages ;  $num_page++ ) {
+                                    $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . '&page=' . $num_page . "' ");
+                                    $UrlsCount1++;
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $uri = str_replace('&amp;', '&', $uri);
+                                                    $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . '&' . $uri . '&page=' . $num_page . "' ");
+                                                    $UrlsCount1++;
+                                                }
+                                            }
+                                }
+                                }
+				        }
+
+                        $filter_data = array('filter_category_id'  => $category_3['category_id']);
+                        $num_pages = $this->CountNumberOfPages($filter_data);
+    					$this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . "' ");
+    					$UrlsCount1++;
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $uri = str_replace('&amp;', '&', $uri);
+                                                    $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '&' . $uri . "' ");
+                                                    $UrlsCount1++;
+                                                }
+                                            }
+                                if ( !$bots_recache_mode ) {
+                                for ($num_page = 2 ; $num_page <= $num_pages ;  $num_page++ ) {
+                                    $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '&page=' . $num_page . "' ");
+                                    $UrlsCount1++;
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $uri = str_replace('&amp;', '&', $uri);
+                                                    $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '&' . $uri . '&page=' . $num_page . "' ");
+                                                    $UrlsCount1++;
+                                                }
+                                            }
+                                }
+                                }
+				}
+
+                $filter_data = array('filter_category_id'  => $category_2['category_id']);
+                $num_pages = $this->CountNumberOfPages($filter_data);
+				$this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . "' ");
+				$UrlsCount1++;
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $uri = str_replace('&amp;', '&', $uri);
+                                                    $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '&' . $uri . "' ");
+                                                    $UrlsCount1++;
+                                                }
+                                            }
+                        if ( !$bots_recache_mode ) {
+                        for ($num_page = 2 ; $num_page <= $num_pages ;  $num_page++ ) {
+                            $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '&page=' . $num_page . "' ");
+                            $UrlsCount1++;
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $uri = str_replace('&amp;', '&', $uri);
+                                                    $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '&' . $uri . '&page=' . $num_page . "' ");
+                                                    $UrlsCount1++;
+                                                }
+                                            }
+                        }
+                        }
+			}
+
+			$urls[] =  $this->url->link('product/category', 'path=' . $category_1['category_id']);
+			$this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . "' ");
+			$UrlsCount1++;
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $urls[] = $this->url->link('product/category', 'path=' . $category_1['category_id'] . '&' . $uri );
+                                                    $uri = str_replace('&amp;', '&', $uri);
+                                                    $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_category_urls_list SET lscache_category_url = '" . 'path=' . $category_1['category_id'] . '&' . $uri . "' ");
+                                                    $UrlsCount1++;
+                                                }
+                                            }
+		}
+        
+
+		$this->db->query("DELETE FROM " . DB_PREFIX . "setting WHERE store_id = '0' AND `code` = 'module_lscache' AND `key` = 'module_lscache_category_recache_status' ");
+		$this->db->query("INSERT INTO " . DB_PREFIX . "setting SET store_id = '0', `code` = 'module_lscache', `key` = 'module_lscache_category_recache_status', `value` = 'full'");
+		
+		$this->db->query("DELETE FROM " . DB_PREFIX . "setting WHERE store_id = '0' AND `code` = 'module_lscache' AND `key` = 'module_lscache_category_recache_total' ");
+		$this->db->query("INSERT INTO " . DB_PREFIX . "setting SET store_id = '0', `code` = 'module_lscache', `key` = 'module_lscache_category_recache_total', `value` = '" . $UrlsCount1 . "' ");
+
+		return $UrlsCount1;
+
+    }
+	
+	
 	protected function BuildCategoryUrlsListForRecache($FirstItem,$LastItem) {
 	    
 	    $UrlsList = array();
