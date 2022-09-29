@@ -1249,6 +1249,51 @@ class ControllerExtensionModuleLSCache extends Controller
 
 
 	
+	protected function BuildListOfProductUrls($categoryPath1,$bots_recache_mode=false) {
+	    
+        $UrlsCount1 = 0;
+        $this->db->query("CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "lscache_product_list_urls_list` ( `url_list_id` int(11) NOT NULL AUTO_INCREMENT, `lscache_product_url` varchar(255) NOT NULL, `recache_status` tinyint(1) NOT NULL, PRIMARY KEY (`url_list_id`)) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;");
+		foreach ($this->model_catalog_product->getProducts() as $result) {
+            foreach ($this->model_catalog_product->getCategories($result['product_id']) as $category) {
+                if(isset( $categoryPath1[$category['category_id']] )){
+                    $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_product_list_urls_list SET lscache_product_url = '" . 'path=' . $categoryPath1[$category['category_id']] . '&product_id=' . $result['product_id'] . "' ");
+                    $UrlsCount1++;
+                }
+            }
+
+            $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_product_list_urls_list SET lscache_product_url = '" . 'manufacturer_id=' . $result['manufacturer_id'] . '&product_id=' . $result['product_id'] . "' ");
+			$UrlsCount1++;
+
+            $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_product_list_urls_list SET lscache_product_url = '" . 'product_id=' . $result['product_id'] . "' ");
+            $UrlsCount1++;
+            
+            //Journal3 QuickView url
+            if ( defined('JOURNAL3_ACTIVE') && !$bots_recache_mode ) {
+                $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_product_list_urls_list SET lscache_product_url = '" . 'product_id=' . $result['product_id'] . '&popup=quickview' . "' ");
+                $UrlsCount1++;
+            //Journal3 Specific product popup    
+                 if( !empty($this->lscache->includeFilters[0]) ) {
+                                    foreach($this->lscache->includeFilters as $uri) {
+                                        $uri = str_replace('&amp;', '&', $uri);
+                                        $this->db->query("INSERT INTO " . DB_PREFIX . "lscache_product_list_urls_list SET lscache_product_url = '" . 'product_id=' . $result['product_id'] . '&' . $uri . "' ");
+                                        $UrlsCount1++;
+                                    }
+                                }
+            }
+            
+		}
+		
+		$this->db->query("DELETE FROM " . DB_PREFIX . "setting WHERE store_id = '0' AND `code` = 'module_lscache' AND `key` = 'module_lscache_product_list_recache_status' ");
+		$this->db->query("INSERT INTO " . DB_PREFIX . "setting SET store_id = '0', `code` = 'module_lscache', `key` = 'module_lscache_product_list_recache_status', `value` = 'full'");
+		
+		$this->db->query("DELETE FROM " . DB_PREFIX . "setting WHERE store_id = '0' AND `code` = 'module_lscache' AND `key` = 'module_lscache_product_list_recache_total' ");
+		$this->db->query("INSERT INTO " . DB_PREFIX . "setting SET store_id = '0', `code` = 'module_lscache', `key` = 'module_lscache_product_list_recache_total', `value` = '" . $UrlsCount1 . "' ");
+
+		return $UrlsCount1;
+
+    }
+	
+	
 	protected function BuildUrlsListForRecache($FirstItem,$LastItem) {
 	    
 	    $UrlsList = array();
