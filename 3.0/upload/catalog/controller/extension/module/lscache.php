@@ -1249,6 +1249,22 @@ class ControllerExtensionModuleLSCache extends Controller
 
 
 	
+	protected function checkisBot() {
+
+		if ( isset($_SERVER['HTTP_USER_AGENT']) ) {
+		if ( (stripos($_SERVER['HTTP_USER_AGENT'], 'bot') !== FALSE) || (stripos($_SERVER['HTTP_USER_AGENT'], 'compatible') !== FALSE) ) {
+		return TRUE;
+		}
+		if ( (stripos($_SERVER['HTTP_USER_AGENT'], 'image') !== FALSE) || (stripos($_SERVER['HTTP_USER_AGENT'], 'cfnetwork') !== FALSE) || (stripos($_SERVER['HTTP_USER_AGENT'], 'favicon') !== FALSE) || (stripos($_SERVER['HTTP_USER_AGENT'], 'facebook') !== FALSE) || (stripos($_SERVER['HTTP_USER_AGENT'], 'crawler') !== FALSE) || (stripos($_SERVER['HTTP_USER_AGENT'], 'spider') !== FALSE) || (stripos($_SERVER['HTTP_USER_AGENT'], 'Headless') !== FALSE) || (stripos($_SERVER['HTTP_USER_AGENT'], 'runner') !== FALSE) || (stripos($_SERVER['HTTP_USER_AGENT'], 'walker') !== FALSE) ) {
+		return TRUE;
+		}
+		return FALSE;
+	    }
+	    return TRUE;
+
+    }
+	
+	
 	protected function BuildListOfProductUrls($categoryPath1,$bots_recache_mode=false) {
 	    
         $UrlsCount1 = 0;
