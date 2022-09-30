@@ -420,8 +420,12 @@ class ControllerExtensionModuleLSCache extends Controller
             $vary['session'] = 'loggedIn';
         }
 
-        if (isset($this->lscache->setting['module_lscache_vary_safari']) && ($this->lscache->setting['module_lscache_vary_safari'] == '1') && $this->checkSafari()) {
-            $vary['browser'] = 'safari';
+        //if ($this->checkSafari() && isset($this->lscache->setting['module_lscache_vary_safari']) && ($this->lscache->setting['module_lscache_vary_safari']=='1'))  {
+        //    $vary['browser'] = 'safari';
+        //}
+
+        if (($browsercheck=$this->checkBrowser()) && isset($this->lscache->setting['module_lscache_vary_safari']) && ($this->lscache->setting['module_lscache_vary_safari']=='1'))  {
+            $vary['browser'] = $browsercheck;
         }
 
         if (isset($this->lscache->setting['module_lscache_vary_mobile']) && ($this->lscache->setting['module_lscache_vary_mobile'] == '1') && ($device = $this->checkMobile())) {
