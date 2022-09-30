@@ -411,7 +411,7 @@ class ControllerExtensionModuleLSCache extends Controller
 
         
         //cookie not enabled
-        if ((count($vary) == 0) && !$this->checkCookiesEnabled() ){
+        if ( (count($vary) == 0) && (($this->checkCookiesEnabled() == FALSE) || ($this->checkisBot() == TRUE)) )  {
             return;
         }
 
