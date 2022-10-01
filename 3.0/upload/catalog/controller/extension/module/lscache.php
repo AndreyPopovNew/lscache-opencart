@@ -89,10 +89,18 @@ class ControllerExtensionModuleLSCache extends Controller
             }
         }
 
-        $includeUrls = isset($this->lscache->setting['module_lscache_include_urls']) ? explode(PHP_EOL, $this->lscache->setting['module_lscache_include_urls']) : null;
-        $this->lscache->includeUrls = $includeUrls;
-        $excludeLoginUrls = isset($this->lscache->setting['module_lscache_exclude_login_urls']) ? explode(PHP_EOL, $this->lscache->setting['module_lscache_exclude_login_urls']) : null;
-        $excludeUrls = isset($this->lscache->setting['module_lscache_exclude_urls']) ? explode(PHP_EOL, $this->lscache->setting['module_lscache_exclude_urls']) : null;
+        $includeUrls = isset($this->lscache->setting['module_lscache_include_urls']) ? preg_split( '/\n|\r\n?/', $this->lscache->setting['module_lscache_include_urls']) : null;
+        $this->lscache->includeUrls=$includeUrls;
+        
+        // additional sorts and filters to recache_options
+        $includeSorts = isset($this->lscache->setting['module_lscache_include_sorts']) ? preg_split( '/\n|\r\n?/', $this->lscache->setting['module_lscache_include_sorts']) : null;
+        $this->lscache->includeSorts=$includeSorts;
+        $includeFilters = isset($this->lscache->setting['module_lscache_include_filters']) ? preg_split( '/\n|\r\n?/', $this->lscache->setting['module_lscache_include_filters']) : null;
+        $this->lscache->includeFilters=$includeFilters;
+
+        
+        $excludeLoginUrls = isset($this->lscache->setting['module_lscache_exclude_login_urls']) ? preg_split( '/\n|\r\n?/', $this->lscache->setting['module_lscache_exclude_login_urls']) : null;
+        $excludeUrls = isset($this->lscache->setting['module_lscache_exclude_urls']) ? preg_split( '/\n|\r\n?/', $this->lscache->setting['module_lscache_exclude_urls']) : null;
         $uri = trim($_SERVER['REQUEST_URI']);
 
         if ($includeUrls && in_array($uri, $includeUrls)) {
