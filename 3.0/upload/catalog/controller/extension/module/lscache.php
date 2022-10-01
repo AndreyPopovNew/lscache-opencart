@@ -32,7 +32,7 @@ class ControllerExtensionModuleLSCache extends Controller
             return;
         }
 
-        $this->lscache = (object) array('route' => $route, 'setting' => null, 'cacheEnabled' => false, 'pageCachable' => false, 'urlRule' => false, 'esiEnabled' => false, 'esiOn' => false, 'cacheTags' => array(), 'lscInstance' => null, 'pages' => null, 'includeUrls' => null);
+        $this->lscache =  (object) array('route' => $route, 'setting' => null, 'cacheEnabled' => false, 'pageCachable' => false, 'urlRule'=>false, 'esiEnabled' => false, 'esiOn' => false,  'cacheTags'=> array(), 'lscInstance'=> null, 'pages'=> null, 'includeUrls'=> null, 'includeSorts'=> null, 'includeFilters'=> null  );
 
         $this->load->model('extension/module/lscache');
         $this->lscache->setting = $this->model_extension_module_lscache->getItems();
