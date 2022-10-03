@@ -852,6 +852,15 @@ class ControllerExtensionModuleLSCache extends Controller
                         $recache_end_number = $this->request->get['endnum'];
                         $GLOBALS['recache_end_number'] = $recache_end_number;
             }
+
+        // build urls list for easy purge
+        $BuildListForPurge = false;
+        $GLOBALS['BuildListForPurge'] = false;
+            if ( isset($this->request->get['buildlist']) && ( $this->request->get['buildlist'] === '1' ) ) {
+                        $BuildListForPurge = true;
+                        $GLOBALS['BuildListForPurge'] = $BuildListForPurge;
+            }
+	    
 	    
 	    
         if ($cli) {
