@@ -820,6 +820,15 @@ class ControllerExtensionModuleLSCache extends Controller
                         $mode_recache_status = true;
             }
 	    
+
+        // renew cache date
+        $mode_recache_renew = false;
+        $GLOBALS['mode_recache_renew'] = false;
+            if ( isset($this->request->get['renew']) && ( $this->request->get['renew'] === '1'  ) ) {
+                        $mode_recache_renew = true;
+                        $GLOBALS['mode_recache_renew'] = $mode_recache_renew;
+            }
+	    
 	    
         if ($cli) {
             
