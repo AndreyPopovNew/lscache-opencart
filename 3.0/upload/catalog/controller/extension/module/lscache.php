@@ -829,6 +829,13 @@ class ControllerExtensionModuleLSCache extends Controller
                         $GLOBALS['mode_recache_renew'] = $mode_recache_renew;
             }
 	    
+
+        // recache mode for Bots
+        $bots_recache_mode = false;
+            if ( isset($this->request->get['botsua']) && ( $this->request->get['botsua'] === '1' ) ) {
+                        $bots_recache_mode = true;
+            }
+	    
 	    
         if ($cli) {
             
