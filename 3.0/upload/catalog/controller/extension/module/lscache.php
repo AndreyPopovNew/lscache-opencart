@@ -813,6 +813,13 @@ class ControllerExtensionModuleLSCache extends Controller
                 }
             }
 	    
+
+        // recache mode
+        $mode_recache_status = false;
+            if ( isset($this->request->get['mode']) && ( $this->request->get['mode'] === 'restart'  ) ) {
+                        $mode_recache_status = true;
+            }
+	    
 	    
         if ($cli) {
             
