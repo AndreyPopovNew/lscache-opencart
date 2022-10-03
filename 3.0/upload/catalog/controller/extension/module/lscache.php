@@ -782,6 +782,38 @@ class ControllerExtensionModuleLSCache extends Controller
             }
         }
 
+	    
+        // choose what recache
+        $catalog = true;
+        $manufacturer = true;
+        $categories = true;
+        $products = true;
+
+            if ( isset($this->request->get['what']) ) {
+                $what_recache = $this->request->get['what'];
+                switch ( $what_recache ) {
+		            case "1111":
+		            case "all": $catalog = true;$manufacturer = true;$categories = true;$products = true;break;
+            		case "1000":
+            		case "catalog": $catalog = true;$manufacturer = false;$categories = false;$products = false;break;
+		            case "100":
+		            case "manufacturer": $catalog = false;$manufacturer = true;$categories = false;$products = false;break;
+		            case "10":
+		            case "categories": $catalog = false;$manufacturer = false;$categories = true;$products = false;break;
+		            case "1":
+		            case "products": $catalog = false;$manufacturer = false;$categories = false;$products = true;break;
+		            case "1001": $catalog = true;$manufacturer = false;$categories = false;$products = true;break;
+            		case "1011": $catalog = true;$manufacturer = false;$categories = true;$products = true;break;
+		            case "1101": $catalog = true;$manufacturer = true;$categories = false;$products = true;break;
+		            case "1100": $catalog = true;$manufacturer = true;$categories = false;$products = false;break;
+		            case "11": $catalog = false;$manufacturer = false;$categories = true;$products = true;break;
+		            case "101": $catalog = false;$manufacturer = true;$categories = false;$products = true;break;
+		            case "111": $catalog = false;$manufacturer = true;$categories = true;$products = true;break;
+				    default: $catalog = true;$manufacturer = true;$categories = true;$products = true;
+                }
+            }
+	    
+	    
         if ($cli) {
             
         } else if (!isset($this->session->data['previouseURL'])) {
