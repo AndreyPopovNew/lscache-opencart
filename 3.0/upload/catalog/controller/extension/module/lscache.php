@@ -836,6 +836,23 @@ class ControllerExtensionModuleLSCache extends Controller
                         $bots_recache_mode = true;
             }
 	    
+
+        // start recache of products from number
+        $recache_start_number = 0;
+        $GLOBALS['recache_start_number'] = 0;
+            if ( isset($this->request->get['startnum']) ) {
+                        $recache_start_number = $this->request->get['startnum'];
+                        $GLOBALS['recache_start_number'] = $recache_start_number;
+            }
+
+        // recache of products to number
+        $recache_end_number = 0;
+        $GLOBALS['recache_end_number'] = 0;
+            if ( isset($this->request->get['endnum']) ) {
+                        $recache_end_number = $this->request->get['endnum'];
+                        $GLOBALS['recache_end_number'] = $recache_end_number;
+            }
+	    
 	    
         if ($cli) {
             
