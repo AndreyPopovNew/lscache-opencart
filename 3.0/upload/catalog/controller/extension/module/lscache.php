@@ -148,7 +148,7 @@ class ControllerExtensionModuleLSCache extends Controller
             $this->lscache->cacheTags[] = $pageKey;
         }
 
-        $this->log('route:' . $route . PHP_EOL , self::LOG_DEBUG);
+        //$this->log('route:' . $route . PHP_EOL , self::LOG_DEBUG); //comment to prevent strange error in log
 
         $this->event->unregister('controller/*/before', 'extension/module/lscache/onAfterInitialize');
         $this->event->register('controller/' . $route . '/after', new Action('extension/module/lscache/onAfterRender'));
