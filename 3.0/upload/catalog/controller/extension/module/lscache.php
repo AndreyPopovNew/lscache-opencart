@@ -1296,6 +1296,9 @@ class ControllerExtensionModuleLSCache extends Controller
         foreach ($urls as $url) {
 
             $url = str_replace('&amp;', '&', $url);
+            $url = str_replace('&amp%3B', '&', $url);
+            $url = str_replace('?amp%3B', '?', $url);
+            $url = str_replace('page%3D', '&page=', $url);
 
             foreach ($recacheUserAgents as $userAgent) {
                 $cookies1 = $cookies;
