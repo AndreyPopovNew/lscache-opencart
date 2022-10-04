@@ -945,48 +945,169 @@ class ControllerExtensionModuleLSCache extends Controller
         $urls = array();
 	    
 	    
-        $this->load->model('catalog/category');
-        $this->load->model('catalog/product');
-
-        $categories_1 = $this->model_catalog_category->getCategories(0);
+        if ( $products || $categories ) { // recache products or categories
+        
+	$this->load->model('catalog/category');
+	$this->load->model('catalog/product');
+		
+	$categories_1 = $this->model_catalog_category->getCategories(0);
         $categoryPath = array();
 
+
+        if ( $categories ) { //recache categories
         echo 'recache category urls...' . ($cli ? '' : '<br>') . PHP_EOL;
-        foreach ($categories_1 as $category_1) {
-            $categoryPath[$category_1['category_id']] = $category_1['category_id'];
-            $categories_2 = $this->model_catalog_category->getCategories($category_1['category_id']);
-            foreach ($categories_2 as $category_2) {
-                $categoryPath[$category_2['category_id']] = $category_1['category_id'] . '_' . $category_2['category_id'];
-                $categories_3 = $this->model_catalog_category->getCategories($category_2['category_id']);
-                foreach ($categories_3 as $category_3) {
-                    $categoryPath[$category_3['category_id']] = $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'];
-                    $categories_4 = $this->model_catalog_category->getCategories($category_3['category_id']);
-                    foreach ($categories_4 as $category_4) {
-                        $categoryPath[$category_4['category_id']] = $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'];
-                        $categories_5 = $this->model_catalog_category->getCategories($category_4['category_id']);
-                        foreach ($categories_5 as $category_5) {
-                            $categoryPath[$category_5['category_id']] = $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . '_' . $category_5['category_id'];
-                            $urls[] = $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . '_' . $category_5['category_id']);
-                        }
-                        $urls[] = $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id']);
-                        $filter_data = array('filter_category_id' => $category_4['category_id']);
-                        $num_pages = $this->CountNumberOfPages($filter_data);
-                        for ($num_page = 2; $num_page <= $num_pages; $num_page++) {
-                            $urls[] = $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . '&page=' . $num_page);
-                        }
-                    }
-                    $urls[] = $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id']);
-                    $filter_data = array('filter_category_id' => $category_3['category_id']);
-                    $num_pages = $this->CountNumberOfPages($filter_data);
-                    for ($num_page = 2; $num_page <= $num_pages; $num_page++) {
-                        $urls[] = $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '&page=' . $num_page);
-                    }
-                }
-                $urls[] = $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id']);
+
+        // check if Category URLs empty or not and rebuild (restart rebuild)
+        if ( $mode_recache_status && $this->CheckDBBuildKeys('category',$mode_recache_status) ) {
+            $BuildCategoryUrlsValue = $this->BuildCategoryUrls($bots_recache_mode);
+        } else {
+            if ( $this->CheckDBBuildKeys('category') ) {
+            $BuildCategoryUrlsValue = $this->BuildCategoryUrls($bots_recache_mode);
             }
-            $urls[] = $this->url->link('product/category', 'path=' . $category_1['category_id']);
         }
+        
+        if ( $this->model_extension_module_lscache->getSettingValue('module_lscache','module_lscache_category_recache_status') == 'manual') {
+		foreach ($categories_1 as $category_1) {
+            $categoryPath[$category_1['category_id']] = $category_1['category_id'];
+
+			$categories_2 = $this->model_catalog_category->getCategories($category_1['category_id']);
+
+			foreach ($categories_2 as $category_2) {
+                $categoryPath[$category_2['category_id']] = $category_1['category_id'] . '_' . $category_2['category_id'];
+
+				$categories_3 = $this->model_catalog_category->getCategories($category_2['category_id']);
+
+				foreach ($categories_3 as $category_3) {
+                    $categoryPath[$category_3['category_id']] = $category_1['category_id'] . '_' . $category_2['category_id'] . '_' .  $category_3['category_id'];
+
+                        $categories_4 = $this->model_catalog_category->getCategories($category_3['category_id']);
+
+				        foreach ($categories_4 as $category_4) {
+                            $categoryPath[$category_4['category_id']] = $category_1['category_id'] . '_' . $category_2['category_id'] . '_' .  $category_3['category_id'] . '_' .  $category_4['category_id'];
+
+                            $categories_5 = $this->model_catalog_category->getCategories($category_4['category_id']);
+
+                            foreach ($categories_5 as $category_5) {
+                                $categoryPath[$category_5['category_id']] = $category_1['category_id'] . '_' . $category_2['category_id'] . '_' .  $category_3['category_id'] . '_' .  $category_4['category_id'] . '_' .  $category_5['category_id'];
+
+                                $filter_data = array('filter_category_id'  => $category_5['category_id']);
+                                $num_pages = $this->CountNumberOfPages($filter_data);
+                                $urls[] =  $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . '_' . $category_5['category_id']);
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $urls[] = $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . '_' . $category_5['category_id'] . '&' . $uri);
+                                                }
+                                            }
+                                    for ($num_page = 2 ; $num_page <= $num_pages ;  $num_page++ ) {
+                                        $urls[] =  $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . '_' . $category_5['category_id'] . '&page=' . $num_page);
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $urls[] = $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . '_' . $category_5['category_id'] . '&' . $uri . '&page=' . $num_page);
+                                                }
+                                            }
+                                    }
+                            }
+
+
+                        $filter_data = array('filter_category_id'  => $category_4['category_id']);
+                        $num_pages = $this->CountNumberOfPages($filter_data);
+
+                        $urls[] =  $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id']);
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $urls[] = $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . '&' . $uri);
+                                                }
+                                            }
+                                for ($num_page = 2 ; $num_page <= $num_pages ;  $num_page++ ) {
+                                    $urls[] =  $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . '&page=' . $num_page);
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $urls[] = $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '_' . $category_4['category_id'] . '&' . $uri . '&page=' . $num_page);
+                                                }
+                                            }
+                                }
+				        }
+
+                        $filter_data = array('filter_category_id'  => $category_3['category_id']);
+                        $num_pages = $this->CountNumberOfPages($filter_data);
+					$urls[] =  $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id']);
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $urls[] = $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '&' . $uri);
+                                                }
+                                            }
+                                for ($num_page = 2 ; $num_page <= $num_pages ;  $num_page++ ) {
+                                    $urls[] =  $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '&page=' . $num_page);
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $urls[] = $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '_' . $category_3['category_id'] . '&' . $uri . '&page=' . $num_page);
+                                                }
+                                            }
+                                }
+				}
+
+                $filter_data = array('filter_category_id'  => $category_2['category_id']);
+                $num_pages = $this->CountNumberOfPages($filter_data);
+				$urls[] =  $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id']) ;
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $urls[] = $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '&' . $uri);
+                                                }
+                                            }
+                        for ($num_page = 2 ; $num_page <= $num_pages ;  $num_page++ ) {
+                            $urls[] =  $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '&page=' . $num_page);
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $urls[] = $this->url->link('product/category', 'path=' . $category_1['category_id'] . '_' . $category_2['category_id'] . '&' . $uri . '&page=' . $num_page);
+                                                }
+                                            }
+                        }
+			}
+
+			$urls[] =  $this->url->link('product/category', 'path=' . $category_1['category_id']);
+			                                if( !empty($this->lscache->includeSorts[0]) ) {
+                                                foreach($this->lscache->includeSorts as $uri) {
+                                                    $urls[] = $this->url->link('product/category', 'path=' . $category_1['category_id'] . '&' . $uri );
+                                                }
+                                            }
+		}
         $this->crawlUrls($urls, $cli);
+        } else {
+		    $this->BuildCrawlListFromDB('category',$cli);
+        }
+        
+        } else { // build category pathes for product recache
+            echo 'build category pathes...' . ($cli ? '' : '<br>') . PHP_EOL;
+            
+            foreach ($categories_1 as $category_1) {
+            $categoryPath[$category_1['category_id']] = $category_1['category_id'];
+
+			$categories_2 = $this->model_catalog_category->getCategories($category_1['category_id']);
+
+			foreach ($categories_2 as $category_2) {
+                $categoryPath[$category_2['category_id']] = $category_1['category_id'] . '_' . $category_2['category_id'];
+
+				$categories_3 = $this->model_catalog_category->getCategories($category_2['category_id']);
+
+				foreach ($categories_3 as $category_3) {
+                    $categoryPath[$category_3['category_id']] = $category_1['category_id'] . '_' . $category_2['category_id'] . '_' .  $category_3['category_id'];
+
+                        $categories_4 = $this->model_catalog_category->getCategories($category_3['category_id']);
+
+				        foreach ($categories_4 as $category_4) {
+                            $categoryPath[$category_4['category_id']] = $category_1['category_id'] . '_' . $category_2['category_id'] . '_' .  $category_3['category_id'] . '_' .  $category_4['category_id'];
+
+                            $categories_5 = $this->model_catalog_category->getCategories($category_4['category_id']);
+
+                            foreach ($categories_5 as $category_5) {
+                                $categoryPath[$category_5['category_id']] = $category_1['category_id'] . '_' . $category_2['category_id'] . '_' .  $category_3['category_id'] . '_' .  $category_4['category_id'] . '_' .  $category_5['category_id'];
+                            }
+				        }
+				}
+			}
+		    }
+        }
+        } // recache products or categories
         $urls = array();
 
         $this->crawlUrls($urls, $cli);
