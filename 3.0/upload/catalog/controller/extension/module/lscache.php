@@ -884,8 +884,8 @@ class ControllerExtensionModuleLSCache extends Controller
         $urls[] = $this->url->link('information/sitemap');
         $urls[] = $this->url->link('product/manufacturer');
         $urls[] = HTTP_SERVER;
-        $urls[] = HTTP_SERVER . 'index.php';
-        if ($this->lscache->includeUrls) {
+        //$urls[] = HTTP_SERVER . 'index.php';
+        if (!empty($this->lscache->includeUrls[0])) {
             foreach ($this->lscache->includeUrls as $uri) {
                 $urls[] = $this->url->link($uri);
             }
