@@ -896,7 +896,7 @@ class ControllerExtensionModuleLSCache extends Controller
         $this->load->model('extension/module/lscache');
         $pages = $this->model_extension_module_lscache->getPages();
 
-        echo 'recache page urls...' . ($cli ? '' : '<br>') . PHP_EOL;
+        echo 'recache custom pages urls...' . ($cli ? '' : '<br>') . PHP_EOL;
         foreach ($pages as $page) {
             if ($page['cacheLogout']) {
                 $urls[] = $this->url->link($page['route'], '');
@@ -905,6 +905,46 @@ class ControllerExtensionModuleLSCache extends Controller
         $this->crawlUrls($urls, $cli);
         $urls = array();
 
+        // recache catalog (All Products)
+	if ( $catalog ) {
+        echo 'recache whole product catalog urls...' . ($cli ? '' : '<br>') . PHP_EOL;
+        
+        // check if Catalog URLs empty or not and rebuild (restart rebuild)
+        if ( $mode_recache_status && $this->CheckDBBuildKeys('catalog',$mode_recache_status) ) {
+            $BuildCatalogUrlsValue = $this->BuildCatalogUrls($bots_recache_mode);
+        } else {
+            if ( $this->CheckDBBuildKeys('catalog') ) {
+            $BuildCatalogUrlsValue = $this->BuildCatalogUrls($bots_recache_mode);
+            }
+        }
+
+
+        if ( $this->model_extension_module_lscache->getSettingValue('module_lscache','module_lscache_catalog_recache_status') == 'manual') {
+            $filter_data = array('filter_category_id'  => 0);
+            $num_pages = $this->CountNumberOfPages($filter_data);
+			          $urls[] = $this->url->link('product/catalog', '');
+			                  if( !empty($this->lscache->includeSorts[0]) ) {
+                                    foreach($this->lscache->includeSorts as $uri) {
+                                        $urls[] = $this->url->link('product/catalog', $uri);
+                                    }
+                                }
+            for ($num_page = 2 ; $num_page <= $num_pages ;  $num_page++ ) {
+			          $urls[] = $this->url->link('product/catalog', 'page=' . $num_page);
+			                  if( !empty($this->lscache->includeSorts[0]) ) {
+                                    foreach($this->lscache->includeSorts as $uri) {
+                                        $urls[] = $this->url->link('product/catalog', $uri . '&page=' . $num_page);
+                                    }
+                                }
+            }
+        $this->crawlUrls($urls, $cli);
+        } else {
+		    $this->BuildCrawlListFromDB('catalog',$cli);
+        }
+
+        }
+        $urls = array();
+	    
+	    
         $this->load->model('catalog/category');
         $this->load->model('catalog/product');
 
