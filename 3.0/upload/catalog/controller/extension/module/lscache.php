@@ -1241,7 +1241,7 @@ class ControllerExtensionModuleLSCache extends Controller
         $this->log('Start Recache:');
 
         $recacheOption = isset($this->lscache->setting['module_lscache_recache_option']) ? $this->lscache->setting['module_lscache_recache_option'] : 0;
-        $recacheUserAgents = isset($this->lscache->setting['module_lscache_recache_userAgent']) ? explode(PHP_EOL, $this->lscache->setting['module_lscache_recache_userAgent']) : array("lscache_runner");
+        $recacheUserAgents = isset($this->lscache->setting['module_lscache_recache_userAgent']) ? preg_split( '/\n|\r\n?/', $this->lscache->setting['module_lscache_recache_userAgent']) : array("lscache_runner");
         if (empty($recacheUserAgents) || empty($recacheUserAgents[0])) {
             $recacheUserAgents = array('lscache_runner');
         }
