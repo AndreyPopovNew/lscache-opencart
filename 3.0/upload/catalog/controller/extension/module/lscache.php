@@ -1111,12 +1111,46 @@ class ControllerExtensionModuleLSCache extends Controller
         $urls = array();
 
 
+        if ( $manufacturer ) {
         echo 'recache manufacturers urls...' . ($cli ? '' : '<br>') . PHP_EOL;
-        $this->load->model('catalog/manufacturer');
-        foreach ($this->model_catalog_manufacturer->getManufacturers() as $result) {
-            $urls[] = $this->url->link('product/manufacturer/info', 'manufacturer_id=' . $result['manufacturer_id']);
+		$this->load->model('catalog/manufacturer');
+		
+        // check if Manufacturer URLs empty or not and rebuild (restart rebuild)
+        if ( $mode_recache_status && $this->CheckDBBuildKeys('manufacturer',$mode_recache_status) ) {
+            $BuildManufacturerUrlsValue = $this->BuildManufacturerUrls($bots_recache_mode);
+        } else {
+            if ( $this->CheckDBBuildKeys('manufacturer') ) {
+            $BuildManufacturerUrlsValue = $this->BuildManufacturerUrls($bots_recache_mode);
+            }
         }
+        
+        
+        if ( $this->model_extension_module_lscache->getSettingValue('module_lscache','module_lscache_manufacturer_recache_status') == 'manual') {
+		foreach ($this->model_catalog_manufacturer->getManufacturers() as $result) {
+
+                $filter_data = array('filter_manufacturer_id'  => $result['manufacturer_id']);
+        $num_pages = $this->CountNumberOfPages($filter_data);
+			         $urls[] = $this->url->link('product/manufacturer/info', 'manufacturer_id=' . $result['manufacturer_id']);
+			                    if( !empty($this->lscache->includeSorts[0]) ) {
+                                    foreach($this->lscache->includeSorts as $uri) {
+                                        $urls[] = $this->url->link('product/manufacturer/info', 'manufacturer_id=' . $result['manufacturer_id'] .'&' . $uri);
+                                    }
+                                }
+                for ($num_page = 2 ; $num_page <= $num_pages ;  $num_page++ ) {
+			                $urls[] = $this->url->link('product/manufacturer/info', 'manufacturer_id=' . $result['manufacturer_id'] . '&page=' . $num_page);
+			                    if( !empty($this->lscache->includeSorts[0]) ) {
+                                    foreach($this->lscache->includeSorts as $uri) {
+                                        $urls[] = $this->url->link('product/manufacturer/info', 'manufacturer_id=' . $result['manufacturer_id'] . '&' . $uri . '&page=' . $num_page);
+                                    }
+                                }
+                }
+		}
         $this->crawlUrls($urls, $cli);
+		} else {
+		    $this->BuildCrawlListFromDB('manufacturer',$cli);
+		}
+
+        }
         $urls = array();
         
         echo 'recache information urls...' . ($cli ? '' : '<br>') . PHP_EOL;
