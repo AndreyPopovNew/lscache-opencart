@@ -1110,7 +1110,7 @@ class ControllerExtensionModuleLSCache extends Controller
         } // recache products or categories
         $urls = array();
 
-        $this->crawlUrls($urls, $cli);
+
         echo 'recache manufacturers urls...' . ($cli ? '' : '<br>') . PHP_EOL;
         $this->load->model('catalog/manufacturer');
         foreach ($this->model_catalog_manufacturer->getManufacturers() as $result) {
