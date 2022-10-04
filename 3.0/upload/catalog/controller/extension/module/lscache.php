@@ -1161,21 +1161,54 @@ class ControllerExtensionModuleLSCache extends Controller
         $this->crawlUrls($urls, $cli);
         $urls = array();
 
+        if ( $products ) {
         echo 'recache product urls...' . ($cli ? '' : '<br>') . PHP_EOL;
-        foreach ($this->model_catalog_product->getProducts() as $result) {
+        $UrlsCount = 0;
+        $UrlsCountCount = 0;
+        
+        // check if Product URLs List empty or not and rebuild (restart rebuild)
+        if ( $mode_recache_status && $this->CheckDBBuildKeys('product_list',$mode_recache_status) ) {
+            $BuildListOfProductUrlsValue = $this->BuildListOfProductUrls($categoryPath,$bots_recache_mode);
+        } else {
+            if ( $this->CheckDBBuildKeys('product_list') ) {
+            $BuildListOfProductUrlsValue = $this->BuildListOfProductUrls($categoryPath,$bots_recache_mode);
+            }
+        }
+
+        if ( $this->model_extension_module_lscache->getSettingValue('module_lscache','module_lscache_product_list_recache_status') == 'manual') {
+		foreach ($this->model_catalog_product->getProducts() as $result) {
             foreach ($this->model_catalog_product->getCategories($result['product_id']) as $category) {
-                if (isset($categoryPath[$category['category_id']])) {
+                if(isset( $categoryPath[$category['category_id']] )){
                     $urls[] = $this->url->link('product/product', 'path=' . $categoryPath[$category['category_id']] . '&product_id=' . $result['product_id']);
+                    $UrlsCount++;
                 }
             }
 
-            $urls[] = $this->url->link('product/product', 'product_id=' . $result['product_id']);
-            if (defined('JOURNAL3_ACTIVE')) {
-                $urls[] = $this->url->link('journal3/product', 'product_id=' . $result['product_id'] . '&popup=quickview');
-            }            
-        }
+            $urls[] = $this->url->link('product/product', 'manufacturer_id=' . $result['manufacturer_id'] . '&product_id=' . $result['product_id']);
+            $UrlsCount++;
 
-        $this->crawlUrls($urls, $cli);
+            $urls[] = $this->url->link('product/product', 'product_id=' . $result['product_id']);
+            $UrlsCount++;
+            if ( $UrlsCount > 2048 ) {
+                $UrlsCountCount++;
+                echo 'recache '. $UrlsCountCount . ' part of product urls...' . ($cli ? '' : '<br>') . PHP_EOL;
+                $this->crawlUrls($urls, $cli);
+                $urls = array();
+                $UrlsCount = 0;
+            }
+		}
+
+            if ( $UrlsCountCount > 0 ) {
+                echo 'recache '. $UrlsCountCount . ' part of product urls...' . ($cli ? '' : '<br>') . PHP_EOL;
+            }
+            $this->crawlUrls($urls, $cli);
+        } else if ( $GLOBALS['BuildListForPurge'] ) {
+            $this->BuildCrawlListFromDB('product_list',$cli);
+            } else {
+                $this->BuildCrawlListFromDB('product_list',$cli);
+            }
+        
+        }
 
         $data['success'] = $this->language->get('text_success');
 
