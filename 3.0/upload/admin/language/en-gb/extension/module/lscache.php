@@ -53,6 +53,29 @@ $_['entry_purge_urls']     = 'Purge URLs';
 $_['entry_purge_category']     = 'Purge Category Cache on Product Save';
 $_['entry_lscache_cache404']     = 'Cache 404 Pages';
 
+// Include Sorts/Filters
+$_['entry_include_sorts']     = 'Include Sorts/Filters';
+$_['entry_include_filters']     = 'Include Journal Specific';
+$_['entry_module_lscache_product_list_recache_total']     = 'Total Product URLs';
+$_['entry_module_lscache_product_list_last_recached']     = 'Already Recached Product URLs';
+$_['entry_module_lscache_product_list_recache_status']     = 'Product URLs List Status';
+
+// What Recache
+$_['entry_recache_option_what']     = 'Choose what to recache';
+$_['entry_recache_option_what_button']     = 'Recache';
+$_['text_recache_what_default']     = 'recache whole site';
+$_['text_recache_what_products']     = 'recache only products';
+$_['text_recache_what_category']     = 'recache only categories';
+$_['text_recache_what_manufacturer']     = 'recache only manufacturers';
+$_['text_recache_what_catalog']     = 'recache only catalog';
+$_['text_recache_what_category_products']     = 'recache categories and products';
+$_['text_recache_what_manufacturer_category_products']     = 'recache manufacturers, categories and products';
+$_['text_recache_what_manufacturer_products']     = 'recache manufacturers and products';
+$_['text_recache_what_catalog_products']     = 'recache catalog and products';
+$_['text_recache_what_catalog_category_products']     = 'recache catalog, categories and products';
+$_['text_recache_what_catalog_manufacturer']     = 'recache catalog and manufacturers';
+$_['text_recache_what_catalog_manufacturer_products']     = 'recache catalog, manufacturers and products';
+
 $_['help_public_ttl']     = 'LiteSpeed page cache lifetime in seconds';
 $_['help_login_cachable']     = 'If disabled, all web page cache will not be available for logged-in users';
 $_['help_page_login_cachable']     = 'Page Cache for logged-in users';
@@ -67,12 +90,20 @@ $_['hint_exclude_urls'] = "Please input one URL per line. \neg: \n/product/list/
 $_['hint_purge_urls'] = "Please input one full URL per line. \neg: \nhttps://www.your.site/product/nostock/item1";
 $_['help_purge_category']     = 'Purge Product Category cache after saving an Product';
 
+// Include Sorts/Filters
+$_['hint_include_sorts'] = "Please input one kind of sorts or filter per line. \neg: \nsort=p.date_added&order=DESC \neg: \nfm=11";
+$_['hint_include_filters'] = "Please input one Journal specific product url/popup per line. \neg: \npopup=options&product_quantity=1&";
+
 $_['help_purge_system_cache']     = 'Purge all Opencart system cache after purge all LiteSpeed Cache';
 $_['help_esi_ttl']     = 'ESI module cache lifetime in seconds';
 $_['help_esi_tag']     = 'ESI module cache will be purged on esi tag related event';
 $_['help_include_urls']     = 'It will override page settings';
 $_['help_exclude_login_urls']     = 'It will override page settings and Include URLs rule';
 $_['help_exclude_urls']     = 'It will override page settings and other URL rules';
+
+// Include Sorts/Filters
+$_['help_include_sorts']     = 'Additional sorts/filters to recache';
+$_['help_include_filters']     = 'Additional Journal specific product url/popup to recache';
 
 $_['error_permission'] = 'Warning: You do not have permission to modify "LiteSpeed Cache" module!';
 $_['button_purgeAll'] = 'Purge All LiteSpeed Cache';
@@ -83,6 +114,9 @@ $_['button_addModule'] = 'Add New ESI Module';
 $_['button_addRoute'] = 'Add New ESI Route';
 $_['button_deleteModule'] = 'Delete Module Setting';
 $_['button_deletePage'] = 'Delete Page Setting';
+
+// recache What
+$_['button_recacheWhat'] = 'Rebuild Part of LiteSpeed Cache by your choose';
 
 $_['tab_general'] = 'General';
 $_['tab_pages'] = 'Page Settings';
