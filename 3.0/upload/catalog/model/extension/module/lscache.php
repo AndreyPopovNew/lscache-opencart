@@ -124,8 +124,6 @@ class ModelExtensionModuleLSCache extends Model {
 		'checkout/cart', 
 		'checkout/checkout',
 		'checkout/success',
-		'account/register',
-		'account/login',
 		'account/edit',
 		'account/account',
 		'account/password',
@@ -141,18 +139,14 @@ class ModelExtensionModuleLSCache extends Model {
 		'account/voucher',
 		'account/transaction',
 		'account/newsletter',
-		'account/logout',
-		'affiliate/login',
-		'affiliate/register',
 		'affiliate/account',
 		'affiliate/edit',
 		'affiliate/password',
 		'affiliate/payment',
 		'affiliate/tracking',
 		'affiliate/transaction',
-		'affiliate/logout',
-		'product/compare',
-		'error/not_found');
+		'product/compare'
+		);
         
         return in_array($router, $excludeRoutes);
         
