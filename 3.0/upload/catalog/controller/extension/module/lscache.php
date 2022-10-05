@@ -1369,11 +1369,20 @@ class ControllerExtensionModuleLSCache extends Controller
                 }
             }
 
-            if ($cli) {
-                echo $current . '/' . $count . ' ' . $url . ' : ' . $httpcode . PHP_EOL;
-            } else {
-                echo $current . '/' . $count . ' ' . $url . ' : ' . $httpcode . '<br/>' . PHP_EOL;
-            }
+                if ( $GLOBALS['BuildListForPurge'] ) {
+                    echo $url . ($cli ? '' : '<br>') . PHP_EOL;
+                } else if ( $showpathcount ) {
+                    echo $current . '/' . $count . '/' . $pathcount . '/' . $totalurls . ' ' . $url . ' : ' . $httpcode . ($cli ? '' : '<br>') . PHP_EOL;
+                } else {
+                    echo $current . '/' . $count . ' ' . $url . ' : ' . $httpcode . ($cli ? '' : '<br>') . PHP_EOL;
+                }
+
+            //if($cli){
+            //    echo $current . '/' . $count . ' ' . $url . ' : ' . $httpcode . PHP_EOL;
+            //} else {
+            //    echo $current . '/' . $count . ' ' . $url . ' : ' . $httpcode . '<br/>'. PHP_EOL;
+            //}
+		
             flush();
 
             $current++;
