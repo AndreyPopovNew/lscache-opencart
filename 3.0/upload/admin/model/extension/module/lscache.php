@@ -260,6 +260,14 @@ class ModelExtensionModuleLSCache extends Model {
 		$this->db->query(" insert into " . DB_PREFIX . "setting (store_id, code, `key`, value, serialized) values ('0', 'module_lscache', 'module_lscache_purge_category', '0', '0')") ;
 		$this->db->query(" insert into " . DB_PREFIX . "setting (store_id, code, `key`, value, serialized) values ('0', 'module_lscache', 'module_lscache_cache404', '0', '0')") ;
 
+        // lscache crawler product list recache variabels
+        $this->db->query(" insert into " . DB_PREFIX . "setting (store_id, code, `key`, value, serialized) values ('0', 'module_lscache', 'module_lscache_product_list_recache_status', 'empty', '0')") ;
+        $this->db->query(" insert into " . DB_PREFIX . "setting (store_id, code, `key`, value, serialized) values ('0', 'module_lscache', 'module_lscache_product_list_last_recached', '0', '0')") ;
+        $this->db->query(" insert into " . DB_PREFIX . "setting (store_id, code, `key`, value, serialized) values ('0', 'module_lscache', 'module_lscache_product_list_recache_total', '0', '0')") ;
+        
+        // lscache crawler what recache variabels
+        $this->db->query(" insert into " . DB_PREFIX . "setting (store_id, code, `key`, value, serialized) values ('0', 'module_lscache', 'module_lscache_recache_option_what', '1111', '0')") ;
+		
 
         $this->cache->delete('lscache_pages');
         $this->cache->delete('lscache_modules');
