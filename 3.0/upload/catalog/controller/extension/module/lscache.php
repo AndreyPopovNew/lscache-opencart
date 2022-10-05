@@ -1300,48 +1300,45 @@ class ControllerExtensionModuleLSCache extends Controller
             $url = str_replace('?amp%3B', '?', $url);
             $url = str_replace('page%3D', '&page=', $url);
 
-            foreach ($recacheUserAgents as $userAgent) {
-                $cookies1 = $cookies;
-                
-                $varyMobile = false;
-                if (isset($this->lscache->setting['module_lscache_vary_mobile']) && ($this->lscache->setting['module_lscache_vary_mobile'] == '1') && $this->checkMobile($userAgent)) {
-                    $device = $this->checkMobile($userAgent);
-                    $cookies1[] = '_lscache_vary=device%3A' . $device . ';lsc_private=e70f67d087a65a305e80267ba3bfbc97' ;
-                    $varyMobile = true;
-                }
+                        $cookies1 = array('');
+            if ( $cookies == $cookies1 ) {
+                $cookie = '';
+                foreach($recacheUserAgents as $userAgent){
+                $cookie = $this->CookiesForCrawler($userAgent,'',FALSE);
 
-                $varySafari = false;
-                if(isset($this->lscache->setting['module_lscache_vary_safari']) && ($this->lscache->setting['module_lscache_vary_safari'] == '1') && $this->checkSafari($userAgent)) {
-                    $cookies1[] = '_lscache_vary=browser%3Asafari;lsc_private=e70f67d087a65a305e80267ba3bfbc97' ;
-                    $varySafari = true;
-                }
-                
-                if($varyMobile && $varySafari){
-                    $cookies1[] = '_lscache_vary=browser%3Asafari%2Cdevice%3A' . $device . ';lsc_private=e70f67d087a65a305e80267ba3bfbc97';
-                }
-                
-                foreach ($cookies1 as $cookie) {
-                    $this->log('crawl:' . $url . '  useragent:' . $userAgent .  '    cookie:' . $cookie);
+					//error_log(print_r('cookie for crawler (initial empty) : ' . $cookie,true));
+
+                    $this->log('crawl:'.$url . '    cookie:' . $cookie);
                     $start = microtime();
+
                     $ch = curl_init();
                     curl_setopt($ch, CURLOPT_URL, $url);
-                    curl_setopt($ch, CURLOPT_HEADER, false);
+                    curl_setopt($ch, CURLOPT_HEADER, true);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: text/html; charset=utf-8"));
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+                    curl_setopt($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_DEFAULT);
+                    curl_setopt($ch, CURLOPT_SSL_ENABLE_ALPN, true);
+                    curl_setopt($ch, CURLOPT_AUTOREFERER, true);
                     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-                    curl_setopt($ch, CURLOPT_MAXREDIRS, 1);
+                    curl_setopt($ch, CURLOPT_MAXREDIRS, 4);
+                    curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2);
                     curl_setopt($ch, CURLOPT_ENCODING, "");
-                    curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
 
-                    if ($cli && ($userAgent == 'lscache_runner')) {
+                    if($cli && ($userAgent=='lscache_runner')){
                         $userAgent = 'lscache_walker';
                     }
 
                     curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
 
-                    if ($cookie != '') {
+                    if($cookie != ''){
                         curl_setopt($ch, CURLOPT_COOKIE, $cookie);
+                    }
+
+                    if ( $GLOBALS['mode_recache_renew'] ) {
+                    //curl_setopt($ch, CURLOPT_TIMEOUT, 2);
+                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "REFRESH");
                     }
 
                     $buffer = curl_exec($ch);
@@ -1350,23 +1347,92 @@ class ControllerExtensionModuleLSCache extends Controller
 
                     if (in_array($httpcode, $acceptCode)) {
                         $success++;
-                    } else if ($httpcode == 428) {
-                        if (!$cli) {
+                    } else if($httpcode==428){
+                        if(!$cli){
                             echo 'Web Server crawler feature not enabled, please check <a href="https://www.litespeedtech.com/support/wiki/doku.php/litespeed_wiki:cache:lscwp:configuration:enabling_the_crawler" target="_blank">web server settings</a>';
                         } else {
-                            echo 'Web Server crawler feature not enabled, please check "https://www.litespeedtech.com/support/wiki/doku.php/litespeed_wiki:cache:lscwp:configuration:enabling_the_crawler"' . PHP_EOL;
+                            echo 'Web Server crawler feature not enabled, please check "https://www.litespeedtech.com/support/wiki/doku.php/litespeed_wiki:cache:lscwp:configuration:enabling_the_crawler"' .  PHP_EOL;
                         }
-                        $this->log('httpcode:' . $httpcode);
+                        $this->log('httpcode:'.$httpcode);
                         sleep(5);
                         return;
                     } else {
-                        $this->log('httpcode:' . $httpcode);
+                        $this->log('httpcode:'.$httpcode);
+                    }
+
+                    $end = microtime();
+                    $diff = $this->microtimeMinus($start, $end);
+                    //usleep(round($diff));
+                    //echo $diff . ' microseconds for one run' . PHP_EOL;
+                }
+            }   else {
+            foreach($cookies as $cookie){
+                foreach($recacheUserAgents as $userAgent){
+
+                    if ( stripos($cookie, '_lscache_vary') !== FALSE ) {
+                        $cookie = $this->CookiesForCrawler($userAgent,$cookie,TRUE);
+                    }
+
+					//error_log(print_r('cookie for crawler not empty: ' . $cookie,true));
+
+                    $this->log('crawl:'.$url . '    cookie:' . $cookie);
+                    $start = microtime();
+                    
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $url);
+                    curl_setopt($ch, CURLOPT_HEADER, true);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: text/html; charset=utf-8"));
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+                    curl_setopt($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_DEFAULT);
+                    curl_setopt($ch, CURLOPT_SSL_ENABLE_ALPN, true);
+                    curl_setopt($ch, CURLOPT_AUTOREFERER, true);
+                    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+                    curl_setopt($ch, CURLOPT_MAXREDIRS, 4);
+                    curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2);
+                    curl_setopt($ch, CURLOPT_ENCODING, "");
+
+                    if($cli && ($userAgent=='lscache_runner')){
+                        $userAgent = 'lscache_walker';
+                    }
+
+                    curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
+
+                    if($cookie != ''){
+                        curl_setopt($ch, CURLOPT_COOKIE, $cookie);
+                    }
+
+                    if ( $GLOBALS['mode_recache_renew'] ) {
+                    //curl_setopt($ch, CURLOPT_TIMEOUT, 2);
+                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "REFRESH");
+                    }
+
+                    $buffer = curl_exec($ch);
+                    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+
+                    if (in_array($httpcode, $acceptCode)) {
+                        $success++;
+                    } else if($httpcode==428){
+                        if(!$cli){
+                            echo 'Web Server crawler feature not enabled, please check <a href="https://www.litespeedtech.com/support/wiki/doku.php/litespeed_wiki:cache:lscwp:configuration:enabling_the_crawler" target="_blank">web server settings</a>';
+                        } else {
+                            echo 'Web Server crawler feature not enabled, please check "https://www.litespeedtech.com/support/wiki/doku.php/litespeed_wiki:cache:lscwp:configuration:enabling_the_crawler"' .  PHP_EOL;
+                        }
+                        $this->log('httpcode:'.$httpcode);
+                        sleep(5);
+                        return;
+                    } else {
+                        $this->log('httpcode:'.$httpcode);
                     }
 
                     $end = microtime();
                     $diff = $this->microtimeMinus($start, $end);
                     usleep(round($diff));
                 }
+
+            }
             }
 
                 if ( $GLOBALS['BuildListForPurge'] ) {
