@@ -295,7 +295,33 @@
                     <textarea  name="lscache_purge_url" placeholder="{{ hint_purge_urls }}" class="form-control" rows="3">{{ lscache_purge_urls }}</textarea>
                   </div>
                 </div>
-                
+
+
+                <!-- Choose what to recache -->
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="module_lscache_recache_option_what">{{ entry_recache_option_what }}
+					<!-- <button type="submit" name='Rebuild' form="form-lscache-module" data-toggle="tooltip" class="btn btn-success"><i class="fa fa-flash"> &nbsp; {{ entry_recache_option_what_button }}</i></button> -->
+				    <a href="{{ recacheWhat }}" data-toggle="tooltip" title="{{ button_recacheWhat }}" class="btn btn-success"><i class="fa fa-flash"> &nbsp; </i></a>
+                  </label>
+                  
+                  <div class="col-sm-10">
+                    <select name="module_lscache_recache_option_what" class="form-control">
+                      <option value="1111" {{ selectDisable.check(module_lscache_recache_option_what, '1111') }}>{{ text_recache_what_default }}</option>
+                      <option value="1" {{ selectDisable.check(module_lscache_recache_option_what, '1') }}>{{ text_recache_what_products }}</option>
+                      <option value="10" {{ selectDisable.check(module_lscache_recache_option_what, '10') }}>{{ text_recache_what_category }}</option>
+                      <option value="100" {{ selectDisable.check(module_lscache_recache_option_what, '100') }}>{{ text_recache_what_manufacturer }}</option>
+                      <option value="1000" {{ selectDisable.check(module_lscache_recache_option_what, '1000') }}>{{ text_recache_what_catalog }}</option>
+                      <option value="11" {{ selectDisable.check(module_lscache_recache_option_what, '11') }}>{{ text_recache_what_category_products }}</option>
+                      <option value="111" {{ selectDisable.check(module_lscache_recache_option_what, '111') }}>{{ text_recache_what_manufacturer_category_products }}</option>
+                      <option value="1001" {{ selectDisable.check(module_lscache_recache_option_what, '1001') }}>{{ text_recache_what_catalog_products }}</option>                      
+                      <option value="1011" {{ selectDisable.check(module_lscache_recache_option_what, '1011') }}>{{ text_recache_what_catalog_category_products }}</option>
+                      <option value="1100" {{ selectDisable.check(module_lscache_recache_option_what, '1100') }}>{{ text_recache_what_catalog_manufacturer }}</option>
+                      <option value="1101" {{ selectDisable.check(module_lscache_recache_option_what, '1101') }}>{{ text_recache_what_catalog_manufacturer_products }}</option>
+                      <option value="101" {{ selectDisable.check(module_lscache_recache_option_what, '101') }}>{{ text_recache_what_manufacturer_products }}</option>
+                    </select>
+                  </div>
+                </div>
+
             </div>
                 
             <div class="tab-pane {{tabtool.check(tab, 'modules')}}" id="tab-modules">
