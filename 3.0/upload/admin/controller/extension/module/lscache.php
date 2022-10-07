@@ -18,6 +18,7 @@ class ControllerExtensionModuleLSCache extends Controller {
         $data = $this->load->language('extension/module/lscache');
         if(!$this->isCurl()){
             $data["button_recacheAll"] .= $data["text_curl_not_support"];
+	    $data["button_recacheWhat"] .= $data["text_curl_not_support"];
         }
         
         $currentLink = $this->url->link('extension/module/lscache', 'user_token=' . $this->session->data['user_token'],true);
@@ -25,6 +26,8 @@ class ControllerExtensionModuleLSCache extends Controller {
         $parentLink = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'].'&type=module',true);
         $siteUrl = new Url(HTTP_CATALOG, HTTPS_CATALOG);
         $recacheLink = $siteUrl->link('extension/module/lscache/recache', 'user_token=' . $this->session->data['user_token'],true);
+        $settingWhat = $this->model_extension_module_lscache->getItems();
+        $recacheLinkWhat = $siteUrl->link('extension/module/lscache/recache', 'what=' . $settingWhat['module_lscache_recache_option_what'] . '&user_token=' . $this->session->data['user_token'],true);
         
         $action = 'index' ;
         if(isset($this->request->get['action'])){
@@ -198,6 +201,7 @@ class ControllerExtensionModuleLSCache extends Controller {
         $data['purgePage'] = $currentLink . '&action=purgePage';
         $data['purgeESI'] = $currentLink . '&action=purgeESI';
         $data['recacheAll'] = $this->isCurl()? $recacheLink : '#';
+	$data['recacheWhat'] = $this->isCurl()? $recacheLinkWhat : '#';
         $data['addPage'] = $currentLink . '&tab=pages&action=addPage';
         $data['deletePage'] = $currentLink . '&tab=pages&action=deletePage';
         $data['addESIModule'] = $currentLink . '&tab=modules&action=addESIModule';
