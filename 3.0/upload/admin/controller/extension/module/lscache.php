@@ -88,6 +88,28 @@ class ControllerExtensionModuleLSCache extends Controller {
                 $oldSetting["module_lscache_vary_safari"] = '0';
             }
             
+            // add variables for what recache
+            if(!isset($oldSetting["module_lscache_recache_option_what"])){
+                $oldSetting["module_lscache_recache_option_what"] = '1111';
+            }
+            
+            // add variables for recache product list
+            
+            //if(!isset($oldSetting["module_lscache_product_list_recache_status"])){
+                $oldSetting["module_lscache_product_list_recache_status"] = 'empty';
+            //}
+            
+            //if(!isset($oldSetting["module_lscache_product_list_last_recached"])){
+                $oldSetting["module_lscache_product_list_last_recached"] = '0';
+            //}
+            
+            //if(!isset($oldSetting["module_lscache_product_list_recache_total"])){
+                $oldSetting["module_lscache_product_list_recache_total"] = '0';
+            //}
+            
+            // end add
+		
+		
             if(($oldSetting["module_lscache_vary_mobile"]!= $this->request->post["module_lscache_vary_mobile"]) || ($oldSetting["module_lscache_vary_safari"]!= $this->request->post["module_lscache_vary_safari"])){
                 $data['success'] = $this->language->get('text_commentHtaccess');
                 if($lscInstance){
